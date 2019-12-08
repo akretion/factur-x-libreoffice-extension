@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest>
+
+    <manifest:file-entry manifest:full-path="package"
+        manifest:media-type="application/vnd.sun.star.framework-script"/>
+
+</manifest:manifest>
