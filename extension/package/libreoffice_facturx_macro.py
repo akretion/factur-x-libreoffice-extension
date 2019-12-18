@@ -27,6 +27,10 @@ from PyPDF4.generic import DictionaryObject, DecodedStreamObject,\
     NameObject, createStringObject, ArrayObject, IndirectObject
 from PyPDF4.utils import b_
 import hashlib
+import os
+import gettext
+
+_ = gettext.gettext
 
 
 def msg_box(doc, message):
@@ -170,7 +174,7 @@ def open_filepicker(path=None, mode=10):
     if path:
         filepicker.setDisplayDirectory(path)
     filepicker.appendFilter("PDF Files (.pdf)", "*.pdf")
-    filepicker.Title = 'Save Factur-X PDF As'
+    filepicker.Title = _('Save Factur-X PDF As')
     if filepicker.execute():
         return filepicker.getFiles()[0]
 
@@ -254,27 +258,27 @@ def check_data(doc, data):
         # check required fields are set
         if fdict['required']:
             if field not in data:
-                return msg_box(doc, "Missing field %s in the 'Data' tab." % field)
+                return msg_box(doc, _("Missing field %s in the 'Data' tab.") % field)
         if field in data:
-            msg_start = "Field '%s' has value '%s'; "
+            msg_start = _("Field '%s' has value '%s';") + " "
             msg_vals = (field, data[field])
             # check type
             if fdict['type'] == 'float':
                 if not isinstance(data[field], float):
-                    return msg_box(doc, (msg_start + "it should be a float.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("it should be a float.")) % msg_vals)
                 if data[field] < 0:
-                    return msg_box(doc, (msg_start + "it should be positive.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("it should be positive.")) % msg_vals)
             elif fdict['type'] == 'date':
                 if not isinstance(data[field], datetime):
-                    return msg_box(doc, (msg_start + "it should be a date.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("it should be a date.")) % msg_vals)
             elif fdict['type'] == 'char':
                 if not isinstance(data[field], str):
-                    return msg_box(doc, (msg_start + "it should be a string.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("it should be a string.")) % msg_vals)
                 data[field] = data[field].strip()
             # check specific fields
             if field.endswith('country_code'):  # required field
                 if len(data[field]) != 2 or not data[field].isalpha():
-                    return msg_box(doc, (msg_start + "country codes must have 2 letters.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("country codes must have 2 letters.")) % msg_vals)
                 data[field] = data[field].upper()
             if field.endswith('_siret') and data[field]:
                 data[field] = data[field].replace(' ', '')
@@ -285,40 +289,46 @@ def check_data(doc, data):
             if field.endswith('_vat_number'):
                 data[field] = data[field].replace(' ', '').upper()
                 if not is_valid(data[field]):
-                    return msg_box(doc, (msg_start + "the VAT number is invalid.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("the VAT number is invalid.")) % msg_vals)
             if field == 'invoice_currency':  # required field
                 if len(data[field]) != 3 or not data[field].isalpha():
-                    return msg_box(doc, (msg_start + "it should have 3 letters.") % msg_vals)
+                    return msg_box(doc, (msg_start + _("it should have 3 letters.")) % msg_vals)
                 data[field] = data[field].upper()
             elif field == 'invoice_date':
                 near_future = datetime.today() + timedelta(days=3)
                 distant_past = datetime.today() - timedelta(days=5*365)
                 if data['invoice_date'] > near_future or data['invoice_date'] < distant_past:
-                    return msg_box(doc, (msg_start + "it must be in the not-so-distant past, in the present or in the very near future.") % (field, data[field].strftime('%Y-%m-%d')))
+                    return msg_box(doc, (msg_start + _("it must be in the not-so-distant past, in the present or in the very near future.")) % (field, data[field].strftime('%Y-%m-%d')))
 
     # Global checks
     if data['issuer_country_code'] == 'FR' and not data['issuer_siret']:
-        return msg_box(doc, "Field '%s' must have a value because the issuer's country is France.")
+        return msg_box(doc, _("Field '%s' must have a value because the issuer's country is France."))
     diff = data['total_with_tax'] - data['total_without_tax'] - data['total_tax']
     if abs(diff) > 0.00001:
-        return msg_box(doc, "Field 'total_with_tax' (%s) must be equal to 'total_without_tax' (%s) plus 'total_tax' (%s)." % (data['total_with_tax'], data['total_without_tax'], data['total_tax']))
+        return msg_box(doc, _("Field 'total_with_tax' (%s) must be equal to 'total_without_tax' (%s) plus 'total_tax' (%s).") % (data['total_with_tax'], data['total_without_tax'], data['total_tax']))
     if data['total_due'] - 0.00001 > data['total_with_tax']:
-        return msg_box(doc, "Field 'total_due' (%s) cannot be superior to 'total_with_tax' (%s)." % (data['total_due'], data['total_with_tax']))
+        return msg_box(doc, _("Field 'total_due' (%s) cannot be superior to 'total_with_tax' (%s).") % (data['total_due'], data['total_with_tax']))
     if not data.get('invoice_or_refund'):
         data['invoice_or_refund'] = 'invoice'  # default value
     if data['invoice_or_refund'].lower() not in ('invoice', 'refund'):
-        return msg_box(doc, "Field 'invoice_or_refund' has value '%s'; it should be either 'invoice' or 'refund'." % data['invoice_or_refund'])
+        return msg_box(doc, _("Field 'invoice_or_refund' has value '%s'; it should be either 'invoice' or 'refund'.") % data['invoice_or_refund'])
     return True
 
 
 def generate_facturx_invoice_v1(button_arg=None):
     doc = XSCRIPTCONTEXT.getDocument()
+    macro_path = os.path.dirname(__file__).replace('file://', '')
+    localedir = os.path.join(macro_path, 'i18n')
+    gettext.bindtextdomain('facturx_macro', localedir=localedir)
+    gettext.textdomain('facturx_macro')  # set 'facturx_macro' as global domain
+    # msg = _("Missing 'Data' tab in the spreadsheet.")
+    # print('msg=', msg)
     data_sheet = doc.Sheets.getByName('Data')
     if not data_sheet:
-        return msg_box(doc, "Missing 'Data' tab in the spreadsheet.")
+        return msg_box(doc, _("Missing 'Data' tab in the spreadsheet."))
     inv_sheet = doc.Sheets.getByName('Invoice')
     if not inv_sheet:
-        return msg_box(doc, "Missing 'Invoice' tab in the spreadsheet.")
+        return msg_box(doc, _("Missing 'Invoice' tab in the spreadsheet."))
     data = {}
     for i in range(50):
         keycell = data_sheet.getCellByPosition(0, i)
@@ -329,7 +339,7 @@ def generate_facturx_invoice_v1(button_arg=None):
         elif key.endswith('_date'):
             # when the cell is not recognised as a date, valuecell.Value = 0.0
             if valuecell.Value < 2:
-                return msg_box(doc, "Field '%s' doesn't seem to be a date field. Check the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the way you entered the date in the cell." % key)
+                return msg_box(doc, _("Field '%s' doesn't seem to be a date field. Check the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the format currently used in the cell.") % key)
             date_as_int = int(valuecell.Value)
             value = datetime.fromordinal(datetime(1900, 1, 1).toordinal() + date_as_int - 2)
         else:
@@ -376,10 +386,10 @@ def generate_facturx_invoice_v1(button_arg=None):
 
     pdf_metadata = {
         'author': data['issuer_name'],
-        'keywords': 'Factur-X, Invoice',
-        'title': '%s: Invoice %s' % (
+        'keywords': ','.join(['Factur-X', _('Invoice')]),
+        'title': _('%s: Invoice %s') % (
             data['issuer_name'], data['invoice_number']),
-        'subject': 'Factur-X invoice %s issued by %s' % (
+        'subject': _('Factur-X invoice %s issued by %s') % (
             data['invoice_number'], data['issuer_name']),
         }
 
@@ -472,27 +482,27 @@ def _prepare_pdf_metadata_xml(facturx_level, pdf_metadata):
     <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
       <dc:title>
         <rdf:Alt>
-          <rdf:li xml:lang="x-default">${title}</rdf:li>
+          <rdf:li xml:lang="x-default">{title}</rdf:li>
         </rdf:Alt>
       </dc:title>
       <dc:creator>
         <rdf:Seq>
-          <rdf:li>${author}</rdf:li>
+          <rdf:li>{author}</rdf:li>
         </rdf:Seq>
       </dc:creator>
       <dc:description>
         <rdf:Alt>
-          <rdf:li xml:lang="x-default">${subject}</rdf:li>
+          <rdf:li xml:lang="x-default">{subject}</rdf:li>
         </rdf:Alt>
       </dc:description>
     </rdf:Description>
     <rdf:Description xmlns:pdf="http://ns.adobe.com/pdf/1.3/" rdf:about="">
-      <pdf:Producer>${producer}</pdf:Producer>
+      <pdf:Producer>{producer}</pdf:Producer>
     </rdf:Description>
     <rdf:Description xmlns:xmp="http://ns.adobe.com/xap/1.0/" rdf:about="">
-      <xmp:CreatorTool>${creator_tool}</xmp:CreatorTool>
-      <xmp:CreateDate>${timestamp}</xmp:CreateDate>
-      <xmp:ModifyDate>${timestamp}</xmp:ModifyDate>
+      <xmp:CreatorTool>{creator_tool}</xmp:CreatorTool>
+      <xmp:CreateDate>{timestamp}</xmp:CreateDate>
+      <xmp:ModifyDate>{timestamp}</xmp:ModifyDate>
     </rdf:Description>
     <rdf:Description xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/" xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#" xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#" rdf:about="">
       <pdfaExtension:schemas>
@@ -534,29 +544,26 @@ def _prepare_pdf_metadata_xml(facturx_level, pdf_metadata):
       </pdfaExtension:schemas>
     </rdf:Description>
     <rdf:Description xmlns:fx="urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#" rdf:about="">
-      <fx:DocumentType>${facturx_documenttype}</fx:DocumentType>
-      <fx:DocumentFileName>${facturx_filename}</fx:DocumentFileName>
-      <fx:Version>${facturx_version}</fx:Version>
-      <fx:ConformanceLevel>${facturx_level}</fx:ConformanceLevel>
+      <fx:DocumentType>{facturx_documenttype}</fx:DocumentType>
+      <fx:DocumentFileName>{facturx_filename}</fx:DocumentFileName>
+      <fx:Version>{facturx_version}</fx:Version>
+      <fx:ConformanceLevel>{facturx_level}</fx:ConformanceLevel>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
 <?xpacket end="w"?>
 """
-    replace_dict = {
-        'title': pdf_metadata.get('title', ''),
-        'author': pdf_metadata.get('author', ''),
-        'subject': pdf_metadata.get('subject', ''),
-        'producer': 'PyPDF4',
-        'creator_tool': 'factur-x python lib v%s by Alexis de Lattre' % __version__,
-        'timestamp': _get_metadata_timestamp(),
-        'facturx_documenttype': 'INVOICE',
-        'facturx_filename': FACTURX_FILENAME,
-        'facturx_version': '1.0',
-        'facturx_level': FACTURX_LEVEL2xmp[facturx_level],
-        }
-    for replace_key, replace_value in replace_dict.items():
-        xml_str = xml_str.replace('${%s}' % replace_key, replace_value)
+    xml_str = xml_str.format(
+        title=pdf_metadata.get('title', ''),
+        author=pdf_metadata.get('author', ''),
+        subject=pdf_metadata.get('subject', ''),
+        producer='PyPDF4',
+        creator_tool='factur-x python lib v%s by Alexis de Lattre' % __version__,
+        timestamp=_get_metadata_timestamp(),
+        facturx_documenttype='INVOICE',
+        facturx_filename=FACTURX_FILENAME,
+        facturx_version='1.0',
+        facturx_level=FACTURX_LEVEL2xmp[facturx_level])
     xml_byte = xml_str.encode('utf-8')
     return xml_byte
 
