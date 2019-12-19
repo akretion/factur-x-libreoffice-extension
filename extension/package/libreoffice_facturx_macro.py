@@ -32,6 +32,16 @@ import gettext
 
 _ = gettext.gettext
 
+INVOICE_REFUND_LANG = {
+    # English
+    'invoice': '380',
+    'refund': '381',
+    # French
+    'facture': '380',
+    'avoir': '381',
+    # Add other langs here
+    }
+
 
 def msg_box(doc, message):
     oSM = uno.getComponentContext().getServiceManager()
@@ -75,10 +85,7 @@ def generate_facturx_xml(data):
     header_doc_id.text = data['invoice_number']
     header_doc_typecode = ET.SubElement(
         header_doc, ET.QName(ns['ram'], 'TypeCode'))
-    if data['invoice_or_refund'] == 'refund':
-        header_doc_typecode.text = '381'
-    else:
-        header_doc_typecode.text = '380'
+    header_doc_typecode.text = data['invoice_or_refund']
     date_node = ET.SubElement(header_doc, ET.QName(ns['ram'], 'IssueDateTime'))
     date_node_str = ET.SubElement(
         date_node, ET.QName(ns['udt'], 'DateTimeString'), format='102')
@@ -179,86 +186,123 @@ def open_filepicker(path=None, mode=10):
         return filepicker.getFiles()[0]
 
 
-def check_data(doc, data):
+def get_and_check_data(doc, data_sheet):
     fields = {
         'issuer_name': {
             'type': 'char',
             'required': True,
+            'line': 3,
             },
         'issuer_vat_number': {
             'type': 'char',
             'required': False,
+            'line': 4,
             },
         'issuer_siret': {
             'type': 'char',
             'required': False,
+            'line': 5,
             },
         'issuer_country_code': {
             'type': 'char',
             'required': True,
+            'line': 6,
             },
         'customer_name': {
             'type': 'char',
             'required': True,
+            'line': 8,
             },
         'customer_vat_number': {
             'type': 'char',
             'required': False,
+            'line': 9,
             },
         'customer_siret': {
             'type': 'char',
             'required': False,
+            'line': 10,
             },
         'customer_country_code': {
             'type': 'char',
             'required': True,
+            'line': 11,
             },
         'customer_chorus_service_code': {
             'type': 'char',
             'required': True,
-            },
-        'customer_order_ref': {
-            'type': 'char',
-            'required': False,
+            'line': 12,
             },
         'invoice_or_refund': {
             'type': 'char',
             'required': False,
+            'line': 14,
+            },
+        'customer_order_ref': {
+            'type': 'char',
+            'required': False,
+            'line': 15,
             },
         'invoice_number': {
             'type': 'char',
             'required': True,
+            'line': 16,
             },
         'invoice_date': {
             'type': 'date',
             'required': True,
+            'line': 17,
             },
         'invoice_currency': {
             'type': 'char',
             'required': True,
+            'line': 18,
             },
         'total_without_tax': {
             'type': 'float',
             'required': True,
+            'line': 20,
             },
         'total_tax': {
             'type': 'float',
             'required': True,
+            'line': 21,
             },
         'total_with_tax': {
             'type': 'float',
             'required': True,
+            'line': 22,
             },
         'total_due': {
             'type': 'float',
             'required': True,
+            'line': 23,
             },
         }
+
+    data = {}
+    # Read data
+    for field, fdict in fields.items():
+        valuecell = data_sheet.getCellByPosition(1, fdict['line'] - 1)
+        if field.startswith('total_'):
+            value = valuecell.Value
+        elif field.endswith('_date'):
+            # when the cell is not recognised as a date, valuecell.Value = 0.0
+            if valuecell.Value < 2:
+                return msg_box(doc, _("Cell B%s doesn't seem to be a date field. Check the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the format currently used in the cell.") % fdict['line'])
+            date_as_int = int(valuecell.Value)
+            value = datetime.fromordinal(datetime(1900, 1, 1).toordinal() + date_as_int - 2)
+        else:
+            value = valuecell.String
+        if value:
+            data[field] = value
+
+    # Check data
     for field, fdict in fields.items():
         # check required fields are set
         if fdict['required']:
-            if field not in data:
-                return msg_box(doc, _("Missing field %s in the 'Data' tab.") % field)
+            if fdict['type'] in ('float', 'char') and not data[field]:
+                return msg_box(doc, _("TODO Missing field %s in the 'Data' tab.") % field)
         if field in data:
             msg_start = _("Field '%s' has value '%s';") + " "
             msg_vals = (field, data[field])
@@ -309,10 +353,12 @@ def check_data(doc, data):
     if data['total_due'] - 0.00001 > data['total_with_tax']:
         return msg_box(doc, _("Field 'total_due' (%s) cannot be superior to 'total_with_tax' (%s).") % (data['total_due'], data['total_with_tax']))
     if not data.get('invoice_or_refund'):
-        data['invoice_or_refund'] = 'invoice'  # default value
-    if data['invoice_or_refund'].lower() not in ('invoice', 'refund'):
+        data['invoice_or_refund'] = '380'  # default value is invoice
+    elif data['invoice_or_refund'].lower() in INVOICE_REFUND_LANG:
+        data['invoice_or_refund'] = INVOICE_REFUND_LANG[data['invoice_or_refund']]
+    else:
         return msg_box(doc, _("Field 'invoice_or_refund' has value '%s'; it should be either 'invoice' or 'refund'.") % data['invoice_or_refund'])
-    return True
+    return data
 
 
 def generate_facturx_invoice_v1(button_arg=None):
@@ -323,33 +369,13 @@ def generate_facturx_invoice_v1(button_arg=None):
     gettext.textdomain('facturx_macro')  # set 'facturx_macro' as global domain
     # msg = _("Missing 'Data' tab in the spreadsheet.")
     # print('msg=', msg)
-    data_sheet = doc.Sheets.getByName('Data')
-    if not data_sheet:
-        return msg_box(doc, _("Missing 'Data' tab in the spreadsheet."))
-    inv_sheet = doc.Sheets.getByName('Invoice')
-    if not inv_sheet:
-        return msg_box(doc, _("Missing 'Invoice' tab in the spreadsheet."))
-    data = {}
-    for i in range(50):
-        keycell = data_sheet.getCellByPosition(0, i)
-        key = keycell.String
-        valuecell = data_sheet.getCellByPosition(1, i)
-        if key.startswith('total_'):
-            value = valuecell.Value
-        elif key.endswith('_date'):
-            # when the cell is not recognised as a date, valuecell.Value = 0.0
-            if valuecell.Value < 2:
-                return msg_box(doc, _("Field '%s' doesn't seem to be a date field. Check the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the format currently used in the cell.") % key)
-            date_as_int = int(valuecell.Value)
-            value = datetime.fromordinal(datetime(1900, 1, 1).toordinal() + date_as_int - 2)
-        else:
-            value = valuecell.String
-        if key and value:
-            data[key] = value
-
+    if len(doc.Sheets) < 2:
+        return msg_box(doc, _("The spreadsheet should contain at least 2 tabs."))
+    inv_sheet = doc.Sheets[0]
+    data_sheet = doc.Sheets[1]
     # filter data
-    res_check = check_data(doc, data)
-    if not res_check:
+    data = get_and_check_data(doc, data_sheet)
+    if not data:
         return
 
     # prepare LO PDF export
