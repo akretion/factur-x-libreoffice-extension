@@ -284,80 +284,93 @@ def get_and_check_data(doc, data_sheet):
     # Read data
     for field, fdict in fields.items():
         valuecell = data_sheet.getCellByPosition(1, fdict['line'] - 1)
-        if field.startswith('total_'):
+        labelcell = data_sheet.getCellByPosition(0, fdict['line'] - 1)
+        fdict['label'] = labelcell.String
+        if fdict['type'] == 'float':
             value = valuecell.Value
-        elif field.endswith('_date'):
+        elif fdict['type'] == 'date':
             # when the cell is not recognised as a date, valuecell.Value = 0.0
             if valuecell.Value < 2:
-                return msg_box(doc, _("Cell B%s doesn't seem to be a date field. Check the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the format currently used in the cell.") % fdict['line'])
+                return msg_box(doc, _("In the second tab, cell B%s (%s) doesn't seem to be a date field. Check that the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the format currently used in the cell.") % (fdict['line'], fdict['label']))
             date_as_int = int(valuecell.Value)
             value = datetime.fromordinal(datetime(1900, 1, 1).toordinal() + date_as_int - 2)
         else:
             value = valuecell.String
+        # check required fields are set
+        if fdict['required'] and fdict['type'] in ('float', 'char') and not value:
+            return msg_box(doc, _("In the second tab, cell B%s (%s) is a required field but it is currently empty or its type is wrong.") % (fdict['line'], fdict['label']))
         if value:
             data[field] = value
 
     # Check data
     for field, fdict in fields.items():
-        # check required fields are set
-        if fdict['required']:
-            if fdict['type'] in ('float', 'char') and not data[field]:
-                return msg_box(doc, _("TODO Missing field %s in the 'Data' tab.") % field)
         if field in data:
-            msg_start = _("Field '%s' has value '%s';") + " "
-            msg_vals = (field, data[field])
+            value_display = data[field]
+            if fdict['type'] == 'date':
+                value_display = data[field].strftime('%d %B %Y')
+            msg_start = _("In the second tab, the value of cell B%s (%s) is '%s';") % (
+                fdict['line'], fdict['label'], value_display)
+            msg_start += ' '
             # check type
             if fdict['type'] == 'float':
                 if not isinstance(data[field], float):
-                    return msg_box(doc, (msg_start + _("it should be a float.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("it should be a float."))
                 if data[field] < 0:
-                    return msg_box(doc, (msg_start + _("it should be positive.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("it should be positive."))
             elif fdict['type'] == 'date':
                 if not isinstance(data[field], datetime):
-                    return msg_box(doc, (msg_start + _("it should be a date.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("it should be a date."))
             elif fdict['type'] == 'char':
                 if not isinstance(data[field], str):
-                    return msg_box(doc, (msg_start + _("it should be a string.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("it should be a string."))
                 data[field] = data[field].strip()
             # check specific fields
             if field.endswith('country_code'):  # required field
                 if len(data[field]) != 2 or not data[field].isalpha():
-                    return msg_box(doc, (msg_start + _("country codes must have 2 letters.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("country codes must have 2 letters."))
                 data[field] = data[field].upper()
             if field.endswith('_siret') and data[field]:
                 data[field] = data[field].replace(' ', '')
                 try:
                     validate(data[field])
                 except (InvalidChecksum, InvalidComponent, InvalidFormat, InvalidLength) as e:
-                    return msg_box(doc, (msg_start + str(e)) % msg_vals)
+                    return msg_box(doc, msg_start + str(e))
             if field.endswith('_vat_number'):
                 data[field] = data[field].replace(' ', '').upper()
                 if not is_valid(data[field]):
-                    return msg_box(doc, (msg_start + _("the VAT number is invalid.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("this VAT number is invalid."))
             if field == 'invoice_currency':  # required field
                 if len(data[field]) != 3 or not data[field].isalpha():
-                    return msg_box(doc, (msg_start + _("it should have 3 letters.")) % msg_vals)
+                    return msg_box(doc, msg_start + _("it should have 3 letters."))
                 data[field] = data[field].upper()
             elif field == 'invoice_date':
-                near_future = datetime.today() + timedelta(days=3)
-                distant_past = datetime.today() - timedelta(days=5*365)
+                max_future_days = 3
+                max_past_years = 5
+                near_future = datetime.today() + timedelta(days=max_future_days)
+                # I want to stick to the standard lib, so I don't use relativedelta
+                distant_past = datetime.today() - timedelta(days=max_past_years*365)
                 if data['invoice_date'] > near_future or data['invoice_date'] < distant_past:
-                    return msg_box(doc, (msg_start + _("it must be in the not-so-distant past, in the present or in the very near future.")) % (field, data[field].strftime('%Y-%m-%d')))
+                    return msg_box(doc, msg_start + _("this date must be today or within the %d past years or within the %d next days.") % (max_past_years, max_future_days))
 
     # Global checks
-    if data['issuer_country_code'] == 'FR' and not data['issuer_siret']:
-        return msg_box(doc, _("Field '%s' must have a value because the issuer's country is France."))
+    if data['issuer_country_code'] == 'FR' and not data.get('issuer_siret'):
+        return msg_box(doc, _("In the second tab, cell B%s (%s) must have a value because the issuer's country is France.") % (fields['issuer_siret']['line'], fields['issuer_siret']['label']))
     diff = data['total_with_tax'] - data['total_without_tax'] - data['total_tax']
     if abs(diff) > 0.00001:
-        return msg_box(doc, _("Field 'total_with_tax' (%s) must be equal to 'total_without_tax' (%s) plus 'total_tax' (%s).") % (data['total_with_tax'], data['total_without_tax'], data['total_tax']))
+        return msg_box(doc, _("In the second tab, the value of cell B%s (%s: %s) must be equal to the value of cell B%s (%s: %s) plus cell B%s (%s: %s).") % (
+            fields['total_with_tax']['line'], fields['total_with_tax']['label'], data['total_with_tax'],
+            fields['total_without_tax']['line'], fields['total_without_tax']['label'], data['total_without_tax'],
+            fields['total_tax']['line'], fields['total_tax']['label'], data['total_tax']))
     if data['total_due'] - 0.00001 > data['total_with_tax']:
-        return msg_box(doc, _("Field 'total_due' (%s) cannot be superior to 'total_with_tax' (%s).") % (data['total_due'], data['total_with_tax']))
+        return msg_box(doc, _("In the second tab, the value of cell B%s (%s: %s) cannot be superior to the value of cell B%s (%s: %s).") % (
+            fields['total_due']['line'], fields['total_due']['label'], data['total_due'],
+            fields['total_with_tax']['line'], fields['total_with_tax']['label'], data['total_with_tax']))
     if not data.get('invoice_or_refund'):
         data['invoice_or_refund'] = '380'  # default value is invoice
     elif data['invoice_or_refund'].lower() in INVOICE_REFUND_LANG:
         data['invoice_or_refund'] = INVOICE_REFUND_LANG[data['invoice_or_refund']]
     else:
-        return msg_box(doc, _("Field 'invoice_or_refund' has value '%s'; it should be either 'invoice' or 'refund'.") % data['invoice_or_refund'])
+        return msg_box(doc, _("In the second tab, the value of cell B%s (%s) is '%s'; it should be either 'invoice' or 'refund'.") % (fields['invoice_or_refund']['line'], fields['invoice_or_refund']['label'], data['invoice_or_refund']))
     return data
 
 
