@@ -314,15 +314,15 @@ def get_and_check_data(doc, data_sheet):
             # check type
             if fdict['type'] == 'float':
                 if not isinstance(data[field], float):
-                    return msg_box(doc, msg_start + _("it should be a float."))
+                    return msg_box(doc, msg_start + _("it must be a float."))
                 if data[field] < 0:
-                    return msg_box(doc, msg_start + _("it should be positive."))
+                    return msg_box(doc, msg_start + _("it must be positive."))
             elif fdict['type'] == 'date':
                 if not isinstance(data[field], datetime):
-                    return msg_box(doc, msg_start + _("it should be a date."))
+                    return msg_box(doc, msg_start + _("it must be a date."))
             elif fdict['type'] == 'char':
                 if not isinstance(data[field], str):
-                    return msg_box(doc, msg_start + _("it should be a string."))
+                    return msg_box(doc, msg_start + _("it must be a string."))
                 data[field] = data[field].strip()
             # check specific fields
             if field.endswith('country_code'):  # required field
@@ -341,7 +341,7 @@ def get_and_check_data(doc, data_sheet):
                     return msg_box(doc, msg_start + _("this VAT number is invalid."))
             if field == 'invoice_currency':  # required field
                 if len(data[field]) != 3 or not data[field].isalpha():
-                    return msg_box(doc, msg_start + _("it should have 3 letters."))
+                    return msg_box(doc, msg_start + _("currency codes must have 3 letters."))
                 data[field] = data[field].upper()
             elif field == 'invoice_date':
                 max_future_days = 3
@@ -370,7 +370,7 @@ def get_and_check_data(doc, data_sheet):
     elif data['invoice_or_refund'].lower() in INVOICE_REFUND_LANG:
         data['invoice_or_refund'] = INVOICE_REFUND_LANG[data['invoice_or_refund']]
     else:
-        return msg_box(doc, _("In the second tab, the value of cell B%s (%s) is '%s'; it should be either 'invoice' or 'refund'.") % (fields['invoice_or_refund']['line'], fields['invoice_or_refund']['label'], data['invoice_or_refund']))
+        return msg_box(doc, _("In the second tab, the value of cell B%s (%s) is '%s'; it must be either 'invoice' or 'refund'.") % (fields['invoice_or_refund']['line'], fields['invoice_or_refund']['label'], data['invoice_or_refund']))
     return data
 
 
@@ -383,7 +383,7 @@ def generate_facturx_invoice_v1(button_arg=None):
     # msg = _("Missing 'Data' tab in the spreadsheet.")
     # print('msg=', msg)
     if len(doc.Sheets) < 2:
-        return msg_box(doc, _("The spreadsheet should contain at least 2 tabs."))
+        return msg_box(doc, _("The spreadsheet must contain at least 2 tabs."))
     inv_sheet = doc.Sheets[0]
     data_sheet = doc.Sheets[1]
     # filter data
