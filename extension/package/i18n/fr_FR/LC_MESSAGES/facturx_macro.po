@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-21 09:45+CET\n"
-"PO-Revision-Date: 2019-12-21 09:46+0100\n"
+"POT-Creation-Date: 2019-12-25 00:23+CET\n"
+"PO-Revision-Date: 2019-12-25 00:24+0100\n"
 "Last-Translator: Alexis de Lattre <alexis.delattre@akretion.com>\n"
 "Language-Team: Alexis de Lattre <alexis.delattre@akretion.com>\n"
 "Language: fr_FR\n"
@@ -15,6 +15,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: Poedit 2.0.6\n"
+
+#: libreoffice_facturx_macro.py:50
+msgid "Factur-X Error"
+msgstr "Erreur Factur-X"
 
 #: libreoffice_facturx_macro.py:184
 msgid "Save Factur-X PDF As"

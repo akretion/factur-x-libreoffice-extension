@@ -47,7 +47,7 @@ def msg_box(doc, message):
     oSM = uno.getComponentContext().getServiceManager()
     oToolkit = oSM.createInstance("com.sun.star.awt.Toolkit")
     box_type = "errorbox"
-    box_title = "Error"
+    box_title = _("Factur-X Error")
     box_msg = str(message)
     box_button = 1  # OK button
     oParentWin = doc.getCurrentController().getFrame().getContainerWindow()
@@ -376,7 +376,7 @@ def get_and_check_data(doc, data_sheet):
 
 def generate_facturx_invoice_v1(button_arg=None):
     doc = XSCRIPTCONTEXT.getDocument()
-    macro_path = os.path.dirname(__file__).replace('file://', '')
+    macro_path = os.path.dirname(uno.fileUrlToSystemPath(__file__))
     localedir = os.path.join(macro_path, 'i18n')
     gettext.bindtextdomain('facturx_macro', localedir=localedir)
     gettext.textdomain('facturx_macro')  # set 'facturx_macro' as global domain

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-12-21 09:50+CET\n"
+"POT-Creation-Date: 2019-12-25 00:23+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,6 +14,10 @@ msgstr ""
 "Content-Transfer-Encoding: ENCODING\n"
 "Generated-By: pygettext.py 1.5\n"
 
+
+#: libreoffice_facturx_macro.py:50
+msgid "Factur-X Error"
+msgstr ""
 
 #: libreoffice_facturx_macro.py:184
 msgid "Save Factur-X PDF As"

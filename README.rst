@@ -23,13 +23,12 @@ This extension has been initially developped by Alexis de Lattre from `Akretion 
 Release notes
 =============
 
-* Version 0.14 dated Christmas 2019: first public release.
+* Version 0.15 dated Christmas 2019: first public release.
 
 ====================
 Roadmap - Known bugs
 ====================
 
-* With a Windows OS and LibreOffice in French, error messages are displayed in English under Windows (they are displayed in French under Linux)
 * Find a way to avoid the error message about missing JDK during installation (JDK is **NOT** required ; the extension works perfectly without Java)
 * Translate to German and other languages
 * Add installation instructions for Linux distros other than Debian/Ubuntu
