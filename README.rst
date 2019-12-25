@@ -29,7 +29,7 @@ Release notes
 Roadmap - Known bugs
 ====================
 
-* Find a way to avoid the error message about missing JDK during installation (JDK is **NOT** required ; the extension works perfectly without Java)
+* Provide sample invoice in English
 * Translate to German and other languages
 * Add installation instructions for Linux distros other than Debian/Ubuntu
 * Lobby to have native support for attachments in LibreOffice PDF export, which would simplify a lot this extension!
@@ -60,7 +60,7 @@ Installation steps
 1. Download the LibreOffice extension **factur-x_macro.oxt**.
 #. Open this file with LibreOffice; it will automatically open the LibreOffice extension manager and propose you to install or upgrade the extension. At the end of the installation, a message will inform you that you need to restart LibreOffice.
 
-During the installation, if you have a message saying that you need a Java Development Kit (JDK) from Oracle, please ignore it: the message is not true, **Java is NOT required** to use this extension.
+If you have LibreOffice older than 6.2.0, you will have a message during installation saying that you need a Java Development Kit (JDK) from Oracle. Please ignore the message, **Java is NOT required** to use this extension. This message is a `bug <https://bugs.documentfoundation.org/show_bug.cgi?id=120363>`_ which was fixed in LibreOffice 6.2.0.
 
 =====
 Usage
