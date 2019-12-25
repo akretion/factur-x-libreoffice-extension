@@ -29,7 +29,6 @@ Release notes
 Roadmap - Known bugs
 ====================
 
-* Provide sample invoice in English
 * Translate to German and other languages
 * Add installation instructions for Linux distros other than Debian/Ubuntu
 * Lobby to have native support for attachments in LibreOffice PDF export, which would simplify a lot this extension!
