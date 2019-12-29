@@ -8,16 +8,26 @@ LibreOffice Factur-X Extension
 
 This project provides a `LibreOffice <https://www.libreoffice.org/>`_ Extension to generate `Factur-X <http://fnfe-mpe.org/factur-x/>`_ invoices from a spreadsheet. This extension provides a Python macro that can generate a PDF Factur-X invoice or refund at the Minimum profile. These invoices are compatible with `Chorus Pro <https://chorus-pro.gouv.fr/>`_, the e-invoicing plateform of the French administration.
 
-The aim of this project is to allow small companies that don't have an ERP or invoicing software to generate state-of-the-art electronic invoices. With this LibreOffice extension, we can now say that the generation of Factur-X invoices is not limited to companies with a modern ERP: even a one-person company without any IT background can generate a Factur-X invoice with a simple spreadsheet. And they can do it at no cost using free software only!
+The aim of this project is to allow small companies that don't have an ERP or invoicing software to generate state-of-the-art electronic invoices. With this LibreOffice extension, we can now say that the generation of Factur-X invoices is not limited to companies with a modern ERP: even a tiny company without any IT skills can generate a Factur-X invoice with a simple spreadsheet. And they can do it at no cost using free software only!
 
 The key targets of this project are:
 
-- easy installation (no IT skills needed),
-- multi-platform (Windows, Mac OS, Linux),
-- simplicity and usability for day-to-day invoice generation,
-- no need to speak English: everything should be translated.
+- easy installation: no IT skills needed,
+- multi-platform: Windows, Mac OS, Linux,
+- work offline: no Internet connexion needed to generate a Factur-X invoice,
+- simplicity and usability for daily invoice generation,
+- multi-language: available in French and English (translation to other languages welcomed).
 
 This extension has been initially developped by Alexis de Lattre from `Akretion France <https://akretion.com/>`_. It is published under the `GPL licence <https://www.gnu.org/licenses/gpl-3.0.html>`_.
+
+===============
+Video tutorials
+===============
+
+A video tutorial that shows how to install and use this LibreOffice extension is available:
+
+* in English: `Youtube link <https://www.youtube.com/watch?v=ldD-1W8yIv0>`_
+* in French: `Youtube link <https://www.youtube.com/watch?v=VDm8qUgtkfM>`_
 
 =============
 Release notes
@@ -42,7 +52,7 @@ Installation
 Pre-requisite for Windows and Mac OS
 ------------------------------------
 
-Just check that you have a not-too-old version of LibreOffice installed.
+It is recommended to have LibreOffice 6.2.0 or higher. If your version is older, download a newer version from the `LibreOffice website <https://www.libreoffice.org/download/download/>`_.
 
 Pre-requisite for Linux Debian/Ubuntu
 -------------------------------------
@@ -68,9 +78,14 @@ Usage
 How it works
 ------------
 
-Get the sample invoice **factur-X_FR_modele.ods** (or find the one for your language if it exists). You should personnalize this invoice sample for your company.
+Get the sample invoice for your language:
 
-The macro to generate Factur-X invoices will work if you respect the following conditions:
+* in English: **factur-X_english_invoice_sample.ods**
+* In French: **factur-X_modele_facture_francais.ods**
+
+You should cutomize this invoice sample for your company (replace the company name, address, logo, VAT number, etc).
+
+The macro to generate Factur-X invoices will work if the spreadsheet complies with the following rules:
 
 1. The speadsheet must have at least 2 tabs.
 #. The 1st tab must contain the invoice. It is that tab which is exported to PDF.
