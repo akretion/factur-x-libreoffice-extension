@@ -33,6 +33,11 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.16 dated December 31st 2019:
+
+  * FIX: field *Customer Service Code for Chorus Pro* not declared as required field any more
+  * FIX: avoid crash when fields *Issuer SIRET* or *Issuer VAT Number* were empty
+
 * Version 0.15 dated Christmas 2019: first public release.
 
 ====================

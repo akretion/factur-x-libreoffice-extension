@@ -103,21 +103,23 @@ def generate_facturx_xml(data):
     seller = ET.SubElement(trade_agreement, ET.QName(ns['ram'], 'SellerTradeParty'))
     seller_name = ET.SubElement(seller, ET.QName(ns['ram'], 'Name'))
     seller_name.text = data['issuer_name']
-    seller_legal_org = ET.SubElement(
-        seller, ET.QName(ns['ram'], 'SpecifiedLegalOrganization'))
-    seller_legal_org_id = ET.SubElement(
-        seller_legal_org, ET.QName(ns['ram'], 'ID'), schemeID='0002')
-    seller_legal_org_id.text = data['issuer_siret']
+    if data.get('issuer_siret'):
+        seller_legal_org = ET.SubElement(
+            seller, ET.QName(ns['ram'], 'SpecifiedLegalOrganization'))
+        seller_legal_org_id = ET.SubElement(
+            seller_legal_org, ET.QName(ns['ram'], 'ID'), schemeID='0002')
+        seller_legal_org_id.text = data['issuer_siret']
     seller_country = ET.SubElement(
         seller, ET.QName(ns['ram'], 'PostalTradeAddress'))
     seller_country_code = ET.SubElement(
         seller_country, ET.QName(ns['ram'], 'CountryID'))
     seller_country_code.text = data['issuer_country_code']
-    seller_tax_reg = ET.SubElement(
-        seller, ET.QName(ns['ram'], 'SpecifiedTaxRegistration'))
-    seller_tax_reg_id = ET.SubElement(
-        seller_tax_reg, ET.QName(ns['ram'], 'ID'), schemeID='VA')
-    seller_tax_reg_id.text = data['issuer_vat_number']
+    if data.get('issuer_vat_number'):
+        seller_tax_reg = ET.SubElement(
+            seller, ET.QName(ns['ram'], 'SpecifiedTaxRegistration'))
+        seller_tax_reg_id = ET.SubElement(
+            seller_tax_reg, ET.QName(ns['ram'], 'ID'), schemeID='VA')
+        seller_tax_reg_id.text = data['issuer_vat_number']
     buyer = ET.SubElement(trade_agreement, ET.QName(ns['ram'], 'BuyerTradeParty'))
     buyer_name = ET.SubElement(buyer, ET.QName(ns['ram'], 'Name'))
     buyer_name.text = data['customer_name']
@@ -230,7 +232,7 @@ def get_and_check_data(doc, data_sheet):
             },
         'customer_chorus_service_code': {
             'type': 'char',
-            'required': True,
+            'required': False,
             'line': 12,
             },
         'invoice_or_refund': {
