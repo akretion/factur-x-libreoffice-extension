@@ -68,8 +68,8 @@ Add the support for Python macros for LibreOffice:
 
   sudo apt install libreoffice-script-provider-python
 
-Pre-requisite for Fedora Linux
-------------------------------
+Pre-requisite for Fedora and Mageia Linux
+-----------------------------------------
 
 No need to install any additional package to support Python macros in LibreOffice.
 
