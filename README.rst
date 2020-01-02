@@ -13,7 +13,7 @@ The aim of this project is to allow small companies that don't have an ERP or in
 The key targets of this project are:
 
 - easy installation: no IT skills needed,
-- multi-platform: Windows, Mac OS, Linux,
+- multi-platform: Windows, Mac, Linux,
 - work offline: no Internet connexion needed to generate a Factur-X invoice,
 - simplicity and usability for daily invoice generation,
 - multi-language: available in French and English (translation to other languages welcomed).
@@ -54,7 +54,7 @@ Contributions and pull requests are welcomed.
 Installation
 ============
 
-Pre-requisite for Windows and Mac OS
+Pre-requisite for Windows and macOS
 ------------------------------------
 
 It is recommended to have LibreOffice 6.2.0 or higher. If your version is older, download a newer version from the `LibreOffice website <https://www.libreoffice.org/download/download/>`_.
@@ -68,8 +68,8 @@ Add the support for Python macros for LibreOffice:
 
   sudo apt install libreoffice-script-provider-python
 
-Pre-requisite for Fedora and Mageia Linux
------------------------------------------
+Pre-requisite for Fedora, Mageia and ArchLinux
+----------------------------------------------
 
 No need to install any additional package to support Python macros in LibreOffice.
 
