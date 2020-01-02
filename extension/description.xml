@@ -4,7 +4,7 @@
                          xmlns:d="http://openoffice.org/extensions/description/2006">
 
     <identifier value="com.akretion.factur-x" />
-    <version value="0.16" />
+    <version value="0.17" />
     <platform value="all" />
     <display-name>
         <name lang="en">Factur-X Invoice Generator</name>

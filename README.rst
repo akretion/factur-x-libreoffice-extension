@@ -33,6 +33,10 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.17 dated January 2nd 2020:
+
+  * FIX: Don't raise error with invoices with tax amount or residual at 0
+
 * Version 0.16 dated December 31st 2019:
 
   * FIX: field *Customer Service Code for Chorus Pro* not declared as required field any more

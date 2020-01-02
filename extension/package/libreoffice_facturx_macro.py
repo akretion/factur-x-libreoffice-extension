@@ -299,9 +299,12 @@ def get_and_check_data(doc, data_sheet):
         else:
             value = valuecell.String
         # check required fields are set
-        if fdict['required'] and fdict['type'] in ('float', 'char') and not value:
-            return msg_box(doc, _("In the second tab, cell B%s (%s) is a required field but it is currently empty or its type is wrong.") % (fdict['line'], fdict['label']))
-        if value:
+        if fdict['required']:
+            if fdict['type'] in ('date', 'char') and not value:
+                return msg_box(doc, _("In the second tab, cell B%s (%s) is a required field but it is currently empty or its type is wrong.") % (fdict['line'], fdict['label']))
+            elif fdict['type'] == 'float' and not value:
+                value = 0.0
+        if value or (fdict['type'] == 'float' and fdict['required']):
             data[field] = value
 
     # Check data
