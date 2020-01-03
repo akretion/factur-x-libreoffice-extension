@@ -80,7 +80,8 @@ No need to install any additional package to support Python macros in LibreOffic
 Installation steps
 ------------------
 
-1. Download the LibreOffice extension **factur-x_macro.oxt**.
+1. Go to the menu *Tools > Options* and navigate to *LibreOffice > Security*: click on the button **Macro Security** and select **Medium**.
+#. Download the LibreOffice extension **factur-x_macro.oxt**.
 #. Open this file with LibreOffice; it will automatically open the LibreOffice extension manager and propose you to install or upgrade the extension. At the end of the installation, a message will inform you that you need to restart LibreOffice.
 
 If you have LibreOffice older than 6.2.0, you will have a message during installation saying that you need a Java Development Kit (JDK) from Oracle. Please ignore the message, **Java is NOT required** to use this extension. This message is a `bug <https://bugs.documentfoundation.org/show_bug.cgi?id=120363>`_ which was fixed in LibreOffice 6.2.0.
