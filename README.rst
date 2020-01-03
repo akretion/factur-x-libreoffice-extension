@@ -33,6 +33,11 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.18 dated January 3rd 2020:
+
+  * Add support for additional attachments
+  * Update invoice samples: new field *Number of additional attachments* in the 2nd tab
+
 * Version 0.17 dated January 2nd 2020:
 
   * FIX: Don't raise error with invoices with tax amount or residual at 0

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-12-25 00:23+CET\n"
+"POT-Creation-Date: 2020-01-03 22:28+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,87 +15,95 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: libreoffice_facturx_macro.py:50
+#: libreoffice_facturx_macro.py:51
 msgid "Factur-X Error"
 msgstr ""
 
-#: libreoffice_facturx_macro.py:184
-msgid "Save Factur-X PDF As"
-msgstr ""
-
-#: libreoffice_facturx_macro.py:294
+#: libreoffice_facturx_macro.py:310
 msgid "In the second tab, cell B%s (%s) doesn't seem to be a date field. Check that the type of the cell has a date format. For that, right clic on the cell and select 'Format Cells': in the first tab, select 'Date' as 'Category' and check that the selected 'Format' matches the format currently used in the cell."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:301
+#: libreoffice_facturx_macro.py:318
 msgid "In the second tab, cell B%s (%s) is a required field but it is currently empty or its type is wrong."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:311
+#: libreoffice_facturx_macro.py:330
 msgid "In the second tab, the value of cell B%s (%s) is '%s';"
 msgstr ""
 
-#: libreoffice_facturx_macro.py:317
+#: libreoffice_facturx_macro.py:336
 msgid "it must be a float."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:319
+#: libreoffice_facturx_macro.py:338 libreoffice_facturx_macro.py:343
 msgid "it must be positive."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:322
+#: libreoffice_facturx_macro.py:341
+msgid "it must be an integer."
+msgstr ""
+
+#: libreoffice_facturx_macro.py:346
 msgid "it must be a date."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:325
+#: libreoffice_facturx_macro.py:349
 msgid "it must be a string."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:330
+#: libreoffice_facturx_macro.py:354
 msgid "country codes must have 2 letters."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:341
+#: libreoffice_facturx_macro.py:365
 msgid "this VAT number is invalid."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:344
+#: libreoffice_facturx_macro.py:368
 msgid "currency codes must have 3 letters."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:353
+#: libreoffice_facturx_macro.py:377
 msgid "this date must be today or within the %d past years or within the %d next days."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:357
+#: libreoffice_facturx_macro.py:381
 msgid "In the second tab, cell B%s (%s) must have a value because the issuer's country is France."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:360
+#: libreoffice_facturx_macro.py:384
 msgid "In the second tab, the value of cell B%s (%s: %s) must be equal to the value of cell B%s (%s: %s) plus cell B%s (%s: %s)."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:365
+#: libreoffice_facturx_macro.py:389
 msgid "In the second tab, the value of cell B%s (%s: %s) cannot be superior to the value of cell B%s (%s: %s)."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:373
+#: libreoffice_facturx_macro.py:397
 msgid "In the second tab, the value of cell B%s (%s) is '%s'; it must be either 'invoice' or 'refund'."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:386
+#: libreoffice_facturx_macro.py:410
 msgid "The spreadsheet must contain at least 2 tabs."
 msgstr ""
 
-#: libreoffice_facturx_macro.py:428
+#: libreoffice_facturx_macro.py:448
+msgid "Select attachment No. %d"
+msgstr ""
+
+#: libreoffice_facturx_macro.py:456
+msgid "Save Factur-X PDF As"
+msgstr ""
+
+#: libreoffice_facturx_macro.py:464
 msgid "Invoice"
 msgstr ""
 
-#: libreoffice_facturx_macro.py:429
+#: libreoffice_facturx_macro.py:465
 msgid "%s: Invoice %s"
 msgstr ""
 
-#: libreoffice_facturx_macro.py:431
+#: libreoffice_facturx_macro.py:467
 msgid "Factur-X invoice %s issued by %s"
 msgstr ""
 

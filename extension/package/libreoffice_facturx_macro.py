@@ -28,6 +28,7 @@ from PyPDF4.generic import DictionaryObject, DecodedStreamObject,\
 from PyPDF4.utils import b_
 import hashlib
 import os
+import mimetypes
 import gettext
 
 _ = gettext.gettext
@@ -170,10 +171,11 @@ def generate_facturx_xml(data):
     return xml_byte
 
 
-def open_filepicker(path=None, mode=10):
+def open_filepicker(title, path=None, mode=10, filter_tuple=None):
     """
     Possible modes: http://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1ui_1_1dialogs_1_1TemplateDescription.html
-    mode 10 : with option "automatic file name extension"
+    mode 0: simple open
+    mode 10 : file save with option "automatic file name extension"
     """
     oCtx = uno.getComponentContext()
     oServiceManager = oCtx.getServiceManager()
@@ -182,8 +184,9 @@ def open_filepicker(path=None, mode=10):
         "com.sun.star.ui.dialogs.OfficeFilePicker", (mode,), oCtx)
     if path:
         filepicker.setDisplayDirectory(path)
-    filepicker.appendFilter("PDF Files (.pdf)", "*.pdf")
-    filepicker.Title = _('Save Factur-X PDF As')
+    if filter_tuple:
+        filepicker.appendFilter(filter_tuple[0], filter_tuple[1])
+    filepicker.Title = title
     if filepicker.execute():
         return filepicker.getFiles()[0]
 
@@ -280,6 +283,11 @@ def get_and_check_data(doc, data_sheet):
             'required': True,
             'line': 23,
             },
+        'attachment_count': {
+            'type': 'int',
+            'required': False,
+            'line': 25,
+            },
         }
 
     data = {}
@@ -290,6 +298,12 @@ def get_and_check_data(doc, data_sheet):
         fdict['label'] = labelcell.String
         if fdict['type'] == 'float':
             value = valuecell.Value
+        elif fdict['type'] == 'int':
+            value = valuecell.Value
+            try:
+                value = int(value)
+            except Exception:
+                value = 0
         elif fdict['type'] == 'date':
             # when the cell is not recognised as a date, valuecell.Value = 0.0
             if valuecell.Value < 2:
@@ -304,7 +318,7 @@ def get_and_check_data(doc, data_sheet):
                 return msg_box(doc, _("In the second tab, cell B%s (%s) is a required field but it is currently empty or its type is wrong.") % (fdict['line'], fdict['label']))
             elif fdict['type'] == 'float' and not value:
                 value = 0.0
-        if value or (fdict['type'] == 'float' and fdict['required']):
+        if value or (fdict['type'] in ('float', 'int') and fdict['required']):
             data[field] = value
 
     # Check data
@@ -320,6 +334,11 @@ def get_and_check_data(doc, data_sheet):
             if fdict['type'] == 'float':
                 if not isinstance(data[field], float):
                     return msg_box(doc, msg_start + _("it must be a float."))
+                if data[field] < 0:
+                    return msg_box(doc, msg_start + _("it must be positive."))
+            elif fdict['type'] == 'int':
+                if not isinstance(data[field], int):
+                    return msg_box(doc, msg_start + _("it must be an integer."))
                 if data[field] < 0:
                     return msg_box(doc, msg_start + _("it must be positive."))
             elif fdict['type'] == 'date':
@@ -422,8 +441,20 @@ def generate_facturx_invoice_v1(button_arg=None):
     if not xml_byte:
         return
 
+    # Additionnal attachments
+    additional_attachments = {}
+    if data.get('attachment_count'):
+        for a in range(data['attachment_count']):
+            attach_title = _('Select attachment No. %d') % (a + 1)
+            attachment_url = open_filepicker(attach_title, mode=0)
+            if attachment_url:
+                attach_filename = uno.fileUrlToSystemPath(attachment_url)
+                additional_attachments[attach_filename] = ''
+
     # open "save-as" dialog box
-    fx_pdf_filename_url = open_filepicker()
+    filter_tuple = ("PDF Files (.pdf)", "*.pdf")
+    title = _('Save Factur-X PDF As')
+    fx_pdf_filename_url = open_filepicker(title, filter_tuple=filter_tuple)
     if not fx_pdf_filename_url:  # when the user click on cancel in the dialog box
         return
     fx_pdf_filename = uno.fileUrlToSystemPath(fx_pdf_filename_url)
@@ -440,7 +471,8 @@ def generate_facturx_invoice_v1(button_arg=None):
     generate_facturx_from_file(
         pdf_tmp_file.name, xml_byte, facturx_level='minimum',
         check_xsd=False, pdf_metadata=pdf_metadata,
-        output_pdf_file=fx_pdf_filename)
+        output_pdf_file=fx_pdf_filename,
+        additional_attachments=additional_attachments)
     pdf_tmp_file.close()
     return
 
@@ -612,6 +644,45 @@ def _prepare_pdf_metadata_xml(facturx_level, pdf_metadata):
     return xml_byte
 
 
+def _filespec_additional_attachments(
+        pdf_filestream, name_arrayobj_cdict, file_dict, file_bin):
+    filename = file_dict['filename']
+    mod_date_pdf = _get_pdf_timestamp(file_dict['mod_date'])
+    md5sum = hashlib.md5(file_bin).hexdigest()
+    md5sum_obj = createStringObject(md5sum)
+    params_dict = DictionaryObject({
+        NameObject('/CheckSum'): md5sum_obj,
+        NameObject('/ModDate'): createStringObject(mod_date_pdf),
+        NameObject('/Size'): NameObject(str(len(file_bin))),
+        })
+    file_entry = DecodedStreamObject()
+    file_entry.setData(file_bin)
+    file_mimetype = mimetypes.guess_type(filename)[0]
+    if not file_mimetype:
+        file_mimetype = 'application/octet-stream'
+    file_mimetype_insert = '/' + file_mimetype.replace('/', '#2f')
+    file_entry.update({
+        NameObject("/Type"): NameObject("/EmbeddedFile"),
+        NameObject("/Params"): params_dict,
+        NameObject("/Subtype"): NameObject(file_mimetype_insert),
+        })
+    file_entry_obj = pdf_filestream._addObject(file_entry)
+    ef_dict = DictionaryObject({
+        NameObject("/F"): file_entry_obj,
+        })
+    fname_obj = createStringObject(filename)
+    filespec_dict = DictionaryObject({
+        NameObject("/AFRelationship"): NameObject("/Unspecified"),
+        NameObject("/Desc"): createStringObject(file_dict.get('desc', '')),
+        NameObject("/Type"): NameObject("/Filespec"),
+        NameObject("/F"): fname_obj,
+        NameObject("/EF"): ef_dict,
+        NameObject("/UF"): fname_obj,
+        })
+    filespec_obj = pdf_filestream._addObject(filespec_dict)
+    name_arrayobj_cdict[fname_obj] = filespec_obj
+
+
 def _facturx_update_metadata_add_attachment(
         pdf_filestream, facturx_xml_str, pdf_metadata, facturx_level,
         output_intents=[], additional_attachments={}):
@@ -652,6 +723,9 @@ def _facturx_update_metadata_add_attachment(
         })
     filespec_obj = pdf_filestream._addObject(filespec_dict)
     name_arrayobj_cdict = {fname_obj: filespec_obj}
+    for attach_bin, attach_dict in additional_attachments.items():
+        _filespec_additional_attachments(
+            pdf_filestream, name_arrayobj_cdict, attach_dict, attach_bin)
     name_arrayobj_content_sort = list(
         sorted(name_arrayobj_cdict.items(), key=lambda x: x[0]))
     name_arrayobj_content_final = []
@@ -770,6 +844,20 @@ def generate_facturx_from_file(
     assert isinstance(facturx_xml, bytes)
     xml_string = facturx_xml
     facturx_level = facturx_level.lower()
+    additional_attachments_read = {}
+    if additional_attachments:
+        for attach_filepath, attach_desc in additional_attachments.items():
+            filename = os.path.basename(attach_filepath)
+            mod_timestamp = os.path.getmtime(attach_filepath)
+            mod_dt = datetime.fromtimestamp(mod_timestamp)
+            with open(attach_filepath, 'rb') as fa:
+                fa.seek(0)
+                additional_attachments_read[fa.read()] = {
+                    'filename': filename,
+                    'desc': attach_desc,
+                    'mod_date': mod_dt,
+                    }
+                fa.close()
     original_pdf = PdfFileReader(pdf_invoice)
     # Extract /OutputIntents obj from original invoice
     output_intents = _get_original_output_intents(original_pdf)
@@ -783,7 +871,8 @@ def generate_facturx_from_file(
         # else : generate some ?
     _facturx_update_metadata_add_attachment(
         new_pdf_filestream, xml_string, pdf_metadata, facturx_level,
-        output_intents=output_intents)
+        output_intents=output_intents,
+        additional_attachments=additional_attachments_read)
     if output_pdf_file:
         with open(output_pdf_file, 'wb') as output_f:
             new_pdf_filestream.write(output_f)
