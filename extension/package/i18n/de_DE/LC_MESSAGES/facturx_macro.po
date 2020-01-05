@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-12-25 00:23+CET\n"
+"PO-Revision-Date: 2020-01-03 14:04+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 2.2.4\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de\n"
+
+#: libreoffice_facturx_macro.py:50
+msgid "Factur-X Error"
+msgstr "Factur-X Fehler"
+
+#: libreoffice_facturx_macro.py:184
+msgid "Save Factur-X PDF As"
+msgstr "Factur-X PDF speichern als"
+
+#: libreoffice_facturx_macro.py:294
+msgid ""
+"In the second tab, cell B%s (%s) doesn't seem to be a date field. Check that "
+"the type of the cell has a date format. For that, right clic on the cell and "
+"select 'Format Cells': in the first tab, select 'Date' as 'Category' and "
+"check that the selected 'Format' matches the format currently used in the "
+"cell."
+msgstr ""
+"Zelle B%s (%s) im zweiten Reiter scheint kein Datumsfeld zu sein. Stellen "
+"Sie sicher, dass die Zelle ein Datumsformat hat. Rechtsklicken Sie dazu auf "
+"die Zelle und wählen Sie ‚Format Cells‘: Wählen Sie ‚Date‘ als ‚Category‘ im "
+"ersten Reiter und stellen Sie sicher, dass das gewählte ‚Format‘ dem in der "
+"Zelle verwendeten Format entspricht."
+
+#: libreoffice_facturx_macro.py:301
+msgid ""
+"In the second tab, cell B%s (%s) is a required field but it is currently "
+"empty or its type is wrong."
+msgstr ""
+"Zelle B%s (%s) im zweiten Reiter ist ein Pflichtfeld aber entweder leer oder "
+"im falschen Format."
+
+#: libreoffice_facturx_macro.py:311
+msgid "In the second tab, the value of cell B%s (%s) is '%s';"
+msgstr "Wert der Zelle B%s (%s) im zweiten Reiter ist ‚%s‘;"
+
+#: libreoffice_facturx_macro.py:317
+msgid "it must be a float."
+msgstr "muss eine Fließkommazahl sein."
+
+#: libreoffice_facturx_macro.py:319
+msgid "it must be positive."
+msgstr "muss größer 0 sein."
+
+#: libreoffice_facturx_macro.py:322
+msgid "it must be a date."
+msgstr "muss ein Datum sein."
+
+#: libreoffice_facturx_macro.py:325
+msgid "it must be a string."
+msgstr "muss eine Zeichenkette sein."
+
+#: libreoffice_facturx_macro.py:330
+msgid "country codes must have 2 letters."
+msgstr "Länderabkürzung muss aus zwei Buchstaben bestehen."
+
+#: libreoffice_facturx_macro.py:341
+msgid "this VAT number is invalid."
+msgstr "die USt-ID ist ungültig."
+
+#: libreoffice_facturx_macro.py:344
+msgid "currency codes must have 3 letters."
+msgstr "Währungscodes müssen aus drei Buchstaben bestehen."
+
+#: libreoffice_facturx_macro.py:353
+msgid ""
+"this date must be today or within the %d past years or within the %d next "
+"days."
+msgstr ""
+"Datum muss heute oder innerhalb der %d vergangenen Jahre oder der %d "
+"kommenden Tage liegen."
+
+#: libreoffice_facturx_macro.py:357
+msgid ""
+"In the second tab, cell B%s (%s) must have a value because the issuer's "
+"country is France."
+msgstr ""
+"Zelle B%s (%s) im zweiten Reiter muss einen Wert haben weil Ausstellerland "
+"Frankreich ist."
+
+#: libreoffice_facturx_macro.py:360
+msgid ""
+"In the second tab, the value of cell B%s (%s: %s) must be equal to the value "
+"of cell B%s (%s: %s) plus cell B%s (%s: %s)."
+msgstr ""
+"Wert der Zelle B%s (%s: %s) im zweiten Reiter muss der Summe der Zellen B%s "
+"(%s: %s) und B%s (%s: %s) entsprechen."
+
+#: libreoffice_facturx_macro.py:365
+msgid ""
+"In the second tab, the value of cell B%s (%s: %s) cannot be superior to the "
+"value of cell B%s (%s: %s)."
+msgstr ""
+"Wert der Zelle B%s (%s: %s) im zweiten Reiter darf nicht größer sein als der "
+"Wert der Zelle B%s (%s: %s)."
+
+#: libreoffice_facturx_macro.py:373
+msgid ""
+"In the second tab, the value of cell B%s (%s) is '%s'; it must be either "
+"'invoice' or 'refund'."
+msgstr ""
+"Wert der Zelle B%s (%s) im zweiten Reiter ist ‚%s‘, muss aber entweder "
+"‚Rechnung‘ oder ‚Stornorechnung‘ sein."
+
+#: libreoffice_facturx_macro.py:386
+msgid "The spreadsheet must contain at least 2 tabs."
+msgstr "Die Tabellenkalkulation muss mindestens 2 Reiter enthalten."
+
+#: libreoffice_facturx_macro.py:428
+msgid "Invoice"
+msgstr "Rechnung"
+
+#: libreoffice_facturx_macro.py:429
+msgid "%s: Invoice %s"
+msgstr "%s: Rechnung %s"
+
+#: libreoffice_facturx_macro.py:431
+msgid "Factur-X invoice %s issued by %s"
+msgstr "Factur-X-Rechnung %s ausgestellt durch %s"
