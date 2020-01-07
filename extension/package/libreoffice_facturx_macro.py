@@ -474,6 +474,13 @@ def generate_facturx_invoice_v1(button_arg=None):
         output_pdf_file=fx_pdf_filename,
         additional_attachments=additional_attachments)
     pdf_tmp_file.close()
+
+    # Open PDF viewer
+    oCtx = uno.getComponentContext()
+    oServiceManager = oCtx.getServiceManager()
+    uno_openpdfviewer = oServiceManager.createInstanceWithContext(
+        'com.sun.star.system.SystemShellExecute', oCtx)
+    uno_openpdfviewer.execute(fx_pdf_filename_url, '', 0)
     return
 
 ##################################################

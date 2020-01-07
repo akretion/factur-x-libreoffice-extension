@@ -33,6 +33,10 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.19 dated January 7th 2020:
+
+  * Auto-open PDF after saving it
+
 * Version 0.18 dated January 3rd 2020:
 
   * Add support for additional attachments
