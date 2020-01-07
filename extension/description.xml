@@ -4,7 +4,7 @@
                          xmlns:d="http://openoffice.org/extensions/description/2006">
 
     <identifier value="com.akretion.factur-x" />
-    <version value="0.19" />
+    <version value="0.20" />
     <platform value="all" />
     <display-name>
         <name lang="en">Factur-X Invoice Generator</name>
@@ -14,7 +14,7 @@
         <name xlink:href="mailto:alexis@via.ecp.fr">Alexis de Lattre</name>
     </publisher>
     <icon>
-        <default xlink:href="icon.png" />
+        <default xlink:href="icon_42.png" />
     </icon>
     <extension-description>
         <src xlink:href="https://github.com/akretion/factur-x-libreoffice-extension" lang="en" />
