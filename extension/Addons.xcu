@@ -47,6 +47,9 @@
                     <prop oor:name="ImageSmallURL">
                         <value>%origin%/icon_16.png</value>
                     </prop>
+                    <prop oor:name="ImageBigURL">
+                        <value>%origin%/icon_26.png</value>
+                    </prop>
                 </node>
             </node>
         </node>
