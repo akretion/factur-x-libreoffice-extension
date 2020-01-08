@@ -40,6 +40,9 @@ INVOICE_REFUND_LANG = {
     # French
     'facture': '380',
     'avoir': '381',
+    # German
+    'Rechnung': '380',
+    'Stornorechnung': '381',
     # Add other langs here
     }
 
