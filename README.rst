@@ -33,6 +33,11 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.21 dated January 8th 2020:
+
+  * Add german translation and invoice sample (contributed by Jochen Staerk)
+  * Add big icon 26px for menu entry (in addition to small icon 16px)
+
 * Version 0.20 dated January 8th 2020:
 
   * Add menu entry *File > Export as Factur-X*

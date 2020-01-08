@@ -41,8 +41,8 @@ INVOICE_REFUND_LANG = {
     'facture': '380',
     'avoir': '381',
     # German
-    'Rechnung': '380',
-    'Stornorechnung': '381',
+    'rechnung': '380',
+    'stornorechnung': '381',
     # Add other langs here
     }
 
@@ -395,7 +395,7 @@ def get_and_check_data(doc, data_sheet):
     if not data.get('invoice_or_refund'):
         data['invoice_or_refund'] = '380'  # default value is invoice
     elif data['invoice_or_refund'].lower() in INVOICE_REFUND_LANG:
-        data['invoice_or_refund'] = INVOICE_REFUND_LANG[data['invoice_or_refund']]
+        data['invoice_or_refund'] = INVOICE_REFUND_LANG[data['invoice_or_refund'].lower()]
     else:
         return msg_box(doc, _("In the second tab, the value of cell B%s (%s) is '%s'; it must be either 'invoice' or 'refund'.") % (fields['invoice_or_refund']['line'], fields['invoice_or_refund']['label'], data['invoice_or_refund']))
     return data
