@@ -33,6 +33,10 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.22 dated January 11th 2020:
+
+  * New icon for the extension and for the menu entry
+ 
 * Version 0.21 dated January 8th 2020:
 
   * Add german translation and invoice sample (contributed by Jochen Staerk)
