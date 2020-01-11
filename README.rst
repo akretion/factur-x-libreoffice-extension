@@ -2,6 +2,9 @@
    :target: https://www.gnu.org/licenses/gpl
    :alt: License: GPL-3
 
+.. image:: https://github.com/akretion/factur-x-libreoffice-extension/blob/master/extension/icon_42.png
+   :alt: Project logo
+
 ==============================
 LibreOffice Factur-X Extension
 ==============================
