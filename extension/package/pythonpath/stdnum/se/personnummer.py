@@ -2,7 +2,8 @@
 # coding: utf-8
 #
 # Copyright (C) 2018 Ilya Vihtinsky
-# Copyright (C) 2018 Arthur de Jong
+# Copyright (C) 2018-2020 Arthur de Jong
+# Copyright (C) 2020 Leon Sandøy
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -32,8 +33,6 @@ More information:
 
 >>> validate('880320-0016')
 '880320-0016'
->>> validate('8803200016')
-'880320-0016'
 >>> validate('880320-0018')
 Traceback (most recent call last):
     ...
@@ -59,14 +58,17 @@ def compact(number):
     number = clean(number, ' :')
     if len(number) in (10, 12) and number[-5] not in '-+':
         number = '%s-%s' % (number[:-4], number[-4:])
-    return number
+    return number[:-5].replace('-', '').replace('+', '') + number[-5:]
 
 
 def get_birth_date(number):
-    """Guess the birth date from the number.
+    """Determine the birth date from the number.
 
-    Note that it may be 100 years off because the number has only the last
-    two digits of the year."""
+    For people aged 100 and up, the minus/dash in the personnummer is changed to a plus
+    on New Year's Eve the year they turn 100.
+
+    See Folkbokföringslagen (1991:481), §18.
+    """
     number = compact(number)
     if len(number) == 13:
         year = int(number[0:4])
@@ -102,10 +104,8 @@ def validate(number):
     number = compact(number)
     if len(number) not in (11, 13):
         raise InvalidLength()
-    if number[-5] not in '-+':
-        raise InvalidFormat()
-    digits = clean(number, '-+')
-    if not isdigits(digits):
+    digits = number[:-5] + number[-4:]
+    if number[-5] not in '-+' or not isdigits(digits):
         raise InvalidFormat()
     get_birth_date(number)
     luhn.validate(digits[-10:])

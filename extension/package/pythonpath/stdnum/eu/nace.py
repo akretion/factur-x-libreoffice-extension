@@ -32,7 +32,7 @@ according to revision 2 and based on the registry as published by the EC.
 More information:
 
 * https://en.wikipedia.org/wiki/Statistical_Classification_of_Economic_Activities_in_the_European_Community
-* http://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm?TargetUrl=LST_NOM_DTL&StrNom=NACE_REV2&StrLanguageCode=EN&IntPcKey=&StrLayoutCode=HIERARCHIC
+* https://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm?TargetUrl=LST_NOM_DTL&StrNom=NACE_REV2&StrLanguageCode=EN&IntPcKey=&StrLayoutCode=HIERARCHIC
 
 >>> validate('A')
 'A'
@@ -82,7 +82,7 @@ def get_label(number):
 
 
 def label(number):  # pragma: no cover (deprecated function)
-    """DEPRECATED: use `get_label()` instead."""  # noqa: D402
+    """DEPRECATED: use `get_label()` instead."""  # noqa: D40
     warnings.warn(
         'label() has been to get_label()',
         DeprecationWarning, stacklevel=2)

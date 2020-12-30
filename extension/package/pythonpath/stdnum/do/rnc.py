@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-# Development of this functionality was funded by iterativo | http://iterativo.do
+# Development of this functionality was funded by iterativo | https://iterativo.do
 
 """RNC (Registro Nacional del Contribuyente, Dominican Republic tax number).
 
@@ -112,7 +112,7 @@ def _convert_result(result):  # pragma: no cover
     }
     return dict(
         (translation.get(key, key), value)
-        for key, value in json.loads(result.replace('\t', '\\t')).items())
+        for key, value in json.loads(result.replace('\n', '\\n').replace('\t', '\\t')).items())
 
 
 def check_dgii(number, timeout=30):  # pragma: no cover

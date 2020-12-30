@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-# Development of this functionality was funded by iterativo | http://iterativo.do
+# Development of this functionality was funded by iterativo | https://iterativo.do
 
 """NCF (Números de Comprobante Fiscal, Dominican Republic receipt number).
 
@@ -73,10 +73,12 @@ _ncf_document_types = (
     '03',  # debit note
     '04',  # credit note (refunds)
     '11',  # informal supplier invoices (purchases)
-    '12',  # single income record
+    '12',  # single income invoices
     '13',  # minor expenses invoices (purchases)
     '14',  # invoices for special customers (tourists, free zones)
     '15',  # invoices for the government
+    '16',  # invoices for export
+    '17',  # invoices for payments abroad
 )
 
 _ecf_document_types = (
@@ -131,10 +133,13 @@ def _convert_result(result):  # pragma: no cover
         'MENSAJE_VALIDACION': 'validation_message',
         'RNC': 'rnc',
         'NCF': 'ncf',
+        u'RNC / Cédula': 'rnc',
         u'RNC/Cédula': 'rnc',
+        u'Nombre / Razón Social': 'name',
         u'Nombre/Razón Social': 'name',
         'Estado': 'status',
         'Tipo de comprobante': 'type',
+        u'Válido hasta': 'valid_until',
     }
     return dict(
         (translation.get(key, key), value)
@@ -161,22 +166,21 @@ def check_dgii(rnc, ncf, timeout=30):  # pragma: no cover
         }
 
     Will return None if the number is invalid or unknown."""
+    import lxml.html
     import requests
-    try:
-        from bs4 import BeautifulSoup
-    except ImportError:
-        from BeautifulSoup import BeautifulSoup
     from stdnum.do.rnc import compact as rnc_compact
     rnc = rnc_compact(rnc)
     ncf = compact(ncf)
-    url = 'https://www.dgii.gov.do/app/WebApps/ConsultasWeb/consultas/ncf.aspx'
-    headers = {
+    url = 'https://dgii.gov.do/app/WebApps/ConsultasWeb2/ConsultasWeb/consultas/ncf.aspx'
+    session = requests.Session()
+    session.headers.update({
         'User-Agent': 'Mozilla/5.0 (python-stdnum)',
-    }
-    result = BeautifulSoup(
-        requests.get(url, headers=headers, timeout=timeout).text)
-    validation = result.find('input', {'name': '__EVENTVALIDATION'})['value']
-    viewstate = result.find('input', {'name': '__VIEWSTATE'})['value']
+    })
+    # Get the page to pick up needed form parameters
+    document = lxml.html.fromstring(
+        session.get(url, timeout=timeout).text)
+    validation = document.find('.//input[@name="__EVENTVALIDATION"]').get('value')
+    viewstate = document.find('.//input[@name="__VIEWSTATE"]').get('value')
     data = {
         '__EVENTVALIDATION': validation,
         '__VIEWSTATE': viewstate,
@@ -184,14 +188,15 @@ def check_dgii(rnc, ncf, timeout=30):  # pragma: no cover
         'ctl00$cphMain$txtNCF': ncf,
         'ctl00$cphMain$txtRNC': rnc,
     }
-    result = BeautifulSoup(
-        requests.post(url, headers=headers, data=data, timeout=timeout).text)
-    results = result.find(id='ctl00_cphMain_pResultado')
-    if results:
+    # Do the actual request
+    document = lxml.html.fromstring(
+        session.post(url, data=data, timeout=timeout).text)
+    result = document.find('.//div[@id="cphMain_pResultado"]')
+    if result is not None:
         data = {
-            'validation_message': result.find(id='ctl00_cphMain_lblInformacion').get_text().strip(),
+            'validation_message': document.findtext('.//*[@id="cphMain_lblInformacion"]').strip(),
         }
         data.update(zip(
-            [x.get_text().strip().rstrip(':') for x in results.find_all('strong')],
-            [x.get_text().strip() for x in results.find_all('span')]))
+            [x.text.strip() for x in result.findall('.//th')],
+            [x.text.strip() for x in result.findall('.//td/span')]))
         return _convert_result(data)
