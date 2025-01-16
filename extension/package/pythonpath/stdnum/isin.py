@@ -69,7 +69,7 @@ _iso_3116_1_country_codes = [
     'TV', 'TW', 'TZ', 'UA', 'UG', 'UM', 'US', 'UY', 'UZ', 'VA', 'VC', 'VE',
     'VG', 'VI', 'VN', 'VU', 'WF', 'WS', 'YE', 'YT', 'ZA', 'ZM', 'ZW']
 
-# These special code are allowed for ISIN
+# These special codes are allowed for ISIN
 _country_codes = set(_iso_3116_1_country_codes + [
     'EU',  # European Union
     'QS',  # internally used by Euroclear France
@@ -129,6 +129,5 @@ def is_valid(number):
 
 def from_natid(country_code, number):
     """Generate an ISIN from a national security identifier."""
-    number = compact(number)
-    number = country_code.upper() + (9 - len(number)) * '0' + number
+    number = country_code.upper() + compact(number).zfill(9)
     return number + calc_check_digit(number)

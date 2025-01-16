@@ -2,7 +2,7 @@
 # coding: utf-8
 #
 # Copyright (C) 2015 Holvi Payment Services Oy
-# Copyright (C) 2018-2019 Arthur de Jong
+# Copyright (C) 2018-2022 Arthur de Jong
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -229,6 +229,7 @@ _courts.update(
         ('Bad Homburg', 'Bad Homburg v.d.H.'),
         ('Berlin', 'Berlin (Charlottenburg)'),
         ('Charlottenburg', 'Berlin (Charlottenburg)'),
+        ('Charlottenburg (Berlin)', 'Berlin (Charlottenburg)'),
         ('Kaln', 'Köln'),  # for encoding issues
         ('Kempten', 'Kempten (Allgäu)'),
         ('Ludwigshafen am Rhein (Ludwigshafen)', 'Ludwigshafen a.Rhein (Ludwigshafen)'),
@@ -321,7 +322,7 @@ def is_valid(number):
 
 
 # The base URL for performing lookups
-_offeneregister_url = 'https://db.offeneregister.de/openregister-ef9e802.json'
+_offeneregister_url = 'https://db.offeneregister.de/openregister.json'
 
 
 def check_offeneregister(number, timeout=30):  # pragma: no cover (not part of normal test suite)
@@ -331,16 +332,17 @@ def check_offeneregister(number, timeout=30):  # pragma: no cover (not part of n
     It will contain something like the following::
 
         {
-            'retrieved_at': '2018-06-24T12:34:53Z',
-            'native_company_number': 'The number requested',
-            'company_number': 'Compact company number',
-            'registrar': 'Registar',
-            'federal_state': 'State name',
-            'registered_office': 'Office',
-            'register_art': 'Register type',
-            'register_nummer': 'Number'
-            'name': 'The name of the organisation',
-            'current_status': 'currently registered',
+            'companyId': 'U1206_HRB14011',
+            'courtCode': 'U1206',
+            'courtName': 'Chemnitz',
+            'globalId': 'sn_293298',
+            'isCurrent': 'True',
+            'name': 'Internet hier GmbH Presentation Provider',
+            'nativeReferenceNumber': 'Chemnitz HRB 14011',
+            'referenceNumberFirstSeen': '2020-06-12',
+            'stdRefNo': 'U1206_HRB14011',
+            'validFrom': '2020-06-12',
+            'validTill': '',
         }
 
     Will return None if the number is invalid or unknown.
@@ -349,27 +351,17 @@ def check_offeneregister(number, timeout=30):  # pragma: no cover (not part of n
     # network access for the tests and unnecessarily load the web service
     import requests
     court, registry, number, qualifier = _split(number)
-    # First lookup the registrar code
-    # (we could look up the number by registrar (court), registry and number
-    # but it seems those queries are too slow)
     response = requests.get(
         _offeneregister_url,
         params={
-            'sql': 'select company_number from company where registrar = :p0 limit 1',
-            'p0': court},
-        timeout=timeout)
-    response.raise_for_status()
-    try:
-        registrar = response.json()['rows'][0][0].split('_')[0]
-    except (KeyError, IndexError) as e:  # noqa: F841
-        raise InvalidComponent()  # unknown registrar code
-    # Lookup the number
-    number = '%s_%s%s' % (registrar, registry, number)
-    response = requests.get(
-        _offeneregister_url,
-        params={
-            'sql': 'select * from company where company_number = :p0 limit 1',
-            'p0': number},
+            'sql': '''
+                   select *
+                   from ReferenceNumbers
+                   join Names on ReferenceNumbers.companyId = Names.companyId
+                   where nativeReferenceNumber = :p0
+                   limit 1
+                   ''',
+            'p0': '%s %s %s' % (court, registry, number)},
         timeout=timeout)
     response.raise_for_status()
     try:

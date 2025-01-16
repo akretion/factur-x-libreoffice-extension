@@ -28,7 +28,7 @@ More information:
 
 * https://en.wikipedia.org/wiki/National_identification_number#Netherlands
 * https://nl.wikipedia.org/wiki/Burgerservicenummer
-* http://www.burgerservicenummer.nl/
+* https://www.burgerservicenummer.nl/
 
 >>> validate('1112.22.333')
 '111222333'
@@ -51,9 +51,7 @@ from stdnum.util import clean, isdigits
 def compact(number):
     """Convert the number to the minimal representation. This strips the
     number of any valid separators and removes surrounding whitespace."""
-    number = clean(number, ' -.').strip()
-    # pad with leading zeroes
-    return (9 - len(number)) * '0' + number
+    return clean(number, ' -.').strip().zfill(9)
 
 
 def checksum(number):

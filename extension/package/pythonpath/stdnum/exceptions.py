@@ -1,7 +1,7 @@
 # exceptions.py - collection of stdnum exceptions
 # coding: utf-8
 #
-# Copyright (C) 2013 Arthur de Jong
+# Copyright (C) 2013-2022 Arthur de Jong
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,11 @@ when validation of the number fails.
 """
 
 
-class ValidationError(Exception):
+__all__ = ['ValidationError', 'InvalidFormat', 'InvalidChecksum',
+           'InvalidLength', 'InvalidComponent']
+
+
+class ValidationError(ValueError):
     """Top-level error for validating numbers.
 
     This exception should normally not be raised, only subclasses of this
@@ -36,7 +40,7 @@ class ValidationError(Exception):
         return ''.join(self.args[:1]) or getattr(self, 'message', '')
 
 
-class InvalidFormat(ValidationError):
+class InvalidFormat(ValidationError):  # noqa N818
     """Something is wrong with the format of the number.
 
     This generally means characters or delimiters that are not allowed are
@@ -45,19 +49,19 @@ class InvalidFormat(ValidationError):
     message = 'The number has an invalid format.'
 
 
-class InvalidChecksum(ValidationError):
+class InvalidChecksum(ValidationError):  # noqa N818
     """The number's internal checksum or check digit does not match."""
 
     message = "The number's checksum or check digit is invalid."
 
 
-class InvalidLength(InvalidFormat):
+class InvalidLength(InvalidFormat):  # noqa N818
     """The length of the number is wrong."""
 
     message = 'The number has an invalid length.'
 
 
-class InvalidComponent(ValidationError):
+class InvalidComponent(ValidationError):  # noqa N818
     """One of the parts of the number has an invalid reference.
 
     Some part of the number refers to some external entity like a country

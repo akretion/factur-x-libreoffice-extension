@@ -1,6 +1,7 @@
 # vatin.py - function to validate any given VATIN.
 #
 # Copyright (C) 2020 Leandro Regueiro
+# Copyright (C) 2021-2024 Arthur de Jong
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -58,8 +59,8 @@ _country_modules = dict()
 
 def _get_cc_module(cc):
     """Get the VAT number module based on the country code."""
-    # Greece uses a "wrong" country code
-    cc = cc.lower().replace('el', 'gr')
+    # Greece uses a "wrong" country code, special case for Northern Ireland
+    cc = cc.lower().replace('el', 'gr').replace('xi', 'gb')
     if not re.match(r'^[a-z]{2}$', cc):
         raise InvalidFormat()
     if cc not in _country_modules:
@@ -73,7 +74,10 @@ def compact(number):
     """Convert the number to the minimal representation."""
     number = clean(number).strip()
     module = _get_cc_module(number[:2])
-    return number[:2] + module.compact(number[2:])
+    try:
+        return number[:2].upper() + module.compact(number[2:])
+    except ValidationError:
+        return module.compact(number)
 
 
 def validate(number):
@@ -83,7 +87,10 @@ def validate(number):
     """
     number = clean(number, '').strip()
     module = _get_cc_module(number[:2])
-    return number[:2].upper() + module.validate(number[2:])
+    try:
+        return number[:2].upper() + module.validate(number[2:])
+    except ValidationError:
+        return module.validate(number)
 
 
 def is_valid(number):

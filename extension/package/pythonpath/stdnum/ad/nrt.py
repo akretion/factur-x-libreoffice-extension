@@ -42,7 +42,7 @@ Traceback (most recent call last):
 InvalidComponent: ...
 >>> format('D059888N')
 'D-059888-N'
-"""
+"""  # noqa: E501
 
 from stdnum.exceptions import *
 from stdnum.util import clean, isdigits
@@ -60,7 +60,7 @@ def compact(number):
 def validate(number):
     """Check if the number is a valid Andorra NRT number.
 
-    This checks the length, formatting and other contraints. It does not check
+    This checks the length, formatting and other constraints. It does not check
     for control letter.
     """
     number = compact(number)

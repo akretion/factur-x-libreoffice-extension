@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright Alexis de Lattre <alexis.delattre@akretion.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,11 +19,7 @@ from com.sun.star.beans import PropertyValue
 from tempfile import NamedTemporaryFile
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
-from stdnum.eu.vat import is_valid
-from stdnum.ch.vat import is_valid as ch_is_valid
-# When the following bug will be solved
-# https://github.com/arthurdejong/python-stdnum/issues/245
-# We should be able to have a single import for VAT numbers
+from stdnum.vatin import is_valid
 from stdnum.fr.siret import validate, InvalidChecksum, InvalidComponent, InvalidFormat, InvalidLength
 from PyPDF4 import PdfFileWriter, PdfFileReader
 from PyPDF4.generic import DictionaryObject, DecodedStreamObject,\
@@ -368,12 +363,8 @@ def get_and_check_data(doc, data_sheet):
                     return msg_box(doc, msg_start + str(e))
             if field.endswith('_vat_number'):
                 data[field] = data[field].replace(' ', '').upper()
-                if data[field].startswith('CHE'):
-                    if not ch_is_valid(data[field]):
-                        return msg_box(doc, msg_start + _("this VAT number is invalid."))
-                else:
-                    if not is_valid(data[field]):
-                        return msg_box(doc, msg_start + _("this VAT number is invalid."))
+                if not is_valid(data[field]):
+                    return msg_box(doc, msg_start + _("this VAT number is invalid."))
             if field == 'invoice_currency':  # required field
                 if len(data[field]) != 3 or not data[field].isalpha():
                     return msg_box(doc, msg_start + _("currency codes must have 3 letters."))

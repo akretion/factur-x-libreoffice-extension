@@ -1,7 +1,7 @@
 # vat.py - functions for handling European VAT numbers
 # coding: utf-8
 #
-# Copyright (C) 2012-2018 Arthur de Jong
+# Copyright (C) 2012-2021 Arthur de Jong
 # Copyright (C) 2015 Lionel Elie Mamane
 #
 # This library is free software; you can redistribute it and/or
@@ -39,17 +39,19 @@ that country.
 ['nl']
 """
 
+from stdnum.eu import oss
 from stdnum.exceptions import *
 from stdnum.util import clean, get_cc_module, get_soap_client
 
 
-_country_codes = set([
-    'at', 'be', 'bg', 'cy', 'cz', 'de', 'dk', 'ee', 'es', 'fi', 'fr', 'gb',
-    'gr', 'hr', 'hu', 'ie', 'it', 'lt', 'lu', 'lv', 'mt', 'nl', 'pl', 'pt',
-    'ro', 'se', 'si', 'sk',
+MEMBER_STATES = set([
+    'at', 'be', 'bg', 'cy', 'cz', 'de', 'dk', 'ee', 'es', 'fi', 'fr', 'gr',
+    'hr', 'hu', 'ie', 'it', 'lt', 'lu', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro',
+    'se', 'si', 'sk', 'xi',
 ])
-"""The collection of country codes that are queried. Greece is listed with
-a country code of gr while for VAT purposes el is used instead."""
+"""The collection of country codes that are queried. Greece is listed with a
+country code of gr while for VAT purposes el is used instead. For Northern
+Ireland numbers are prefixed with xi of United Kingdom numbers."""
 
 _country_modules = dict()
 
@@ -61,10 +63,14 @@ def _get_cc_module(cc):
     """Get the VAT number module based on the country code."""
     # Greece uses a "wrong" country code
     cc = cc.lower()
+    if cc in ('eu', 'im'):
+        return oss
     if cc == 'el':
         cc = 'gr'
-    if cc not in _country_codes:
+    if cc not in MEMBER_STATES:
         return
+    if cc == 'xi':
+        cc = 'gb'
     if cc not in _country_modules:
         _country_modules[cc] = get_cc_module(cc, 'vat')
     return _country_modules[cc]
@@ -74,20 +80,28 @@ def compact(number):
     """Convert the number to the minimal representation. This strips the
     number of any valid separators and removes surrounding whitespace."""
     number = clean(number, '').upper().strip()
-    module = _get_cc_module(number[:2])
+    cc = number[:2]
+    module = _get_cc_module(cc)
     if not module:
         raise InvalidComponent()
-    return number[:2] + module.compact(number[2:])
+    number = module.compact(number)
+    if not number.startswith(cc):
+        number = cc + number
+    return number
 
 
 def validate(number):
     """Check if the number is a valid VAT number. This performs the
     country-specific check for the number."""
     number = clean(number, '').upper().strip()
-    module = _get_cc_module(number[:2])
+    cc = number[:2]
+    module = _get_cc_module(cc)
     if not module:
         raise InvalidComponent()
-    return number[:2] + module.validate(number[2:])
+    number = module.validate(number)
+    if not number.startswith(cc):
+        number = cc + number
+    return number
 
 
 def is_valid(number):
@@ -105,7 +119,7 @@ def guess_country(number):
     for which it is valid. This returns lower case codes and returns gr (not
     el) for Greece."""
     return [cc
-            for cc in _country_codes
+            for cc in MEMBER_STATES
             if _get_cc_module(cc).is_valid(number)]
 
 

@@ -36,6 +36,16 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 Release notes
 =============
 
+* Version 0.25 dated January 16h 2025:
+
+  * Update stdnum from 0.14 to 0.20
+  * simplify code for VAT number validation (use stdnum.vatin)
+
+* Version 0.24 dated December 31st 2020:
+
+  * Add support for Swiss VAT numbers
+  * Update stdnum from 0.12 to 0.14
+
 * Version 0.23 dated July 26th 2020:
 
   * Reduce Factur-X PDF file size via the use of flateEncode()
@@ -90,7 +100,7 @@ Installation
 Pre-requisite for Windows and macOS
 ------------------------------------
 
-It is recommended to have LibreOffice 6.2.0 or higher. If your version is older, download a newer version from the `LibreOffice website <https://www.libreoffice.org/download/download/>`_.
+TODO: test on recent versions on Libreoffice on Windows.
 
 Pre-requisite for Linux Debian/Ubuntu
 -------------------------------------
@@ -112,8 +122,6 @@ Installation steps
 1. Go to the menu *Tools > Options* and navigate to *LibreOffice > Security*: click on the button **Macro Security** and select **Medium**.
 #. Download the LibreOffice extension **factur-x_macro.oxt**.
 #. Open this file with LibreOffice; it will automatically open the LibreOffice extension manager and propose you to install or upgrade the extension. At the end of the installation, a message will inform you that you need to restart LibreOffice.
-
-If you have LibreOffice older than 6.2.0, you will have a message during installation saying that you need a Java Development Kit (JDK) from Oracle. Please ignore the message, **Java is NOT required** to use this extension. This message is a `bug <https://bugs.documentfoundation.org/show_bug.cgi?id=120363>`_ which was fixed in LibreOffice 6.2.0.
 
 =====
 Usage
@@ -152,7 +160,7 @@ If you want to check the result...
 The XML file embedded in the Factur-X PDF file is named **factur-x.xml**. To view and/or save it, open the PDF file in a modern PDF reader that is able to read attachments in PDF:
 
 * `Acrobat Reader <https://get.adobe.com/reader/>`_: click on the paper clip icon on the left side bar to view the attachments.
-* `Firefox <https://www.mozilla.org/firefox/>`_ (recent versions only): click on the paper clip icon at the top left.
+* `Firefox <https://www.mozilla.org/firefox/>`_: click on the paper clip icon at the top left.
 * `SumatraPDF <https://www.sumatrapdfreader.org/>`_ (Windows): attachments automatically appear on the left side.
 * `Evince <https://wiki.gnome.org/Apps/Evince>`_ (Linux/Gnome): in the drop-down list at the top left, select *Attachments*.
 * `Okular <https://okular.kde.org/>`_ (Linux/KDE): a blue banner automatically appears at the top when the PDF file has attachments.
@@ -167,4 +175,4 @@ Factur-X is a franco-german e-invoicing standard that is based on a simple conce
 About Chorus Pro
 ================
 
-`Chorus Pro <https://chorus-pro.gouv.fr/>`_ is the e-invoicing portal of the French administration. Starting January 1st 2020, all companies that invoice a public entity (State, local administrations, hospitals, etc.) must send their invoice through Chorus Pro (cf `this page from the Ministry of Economy website <https://www.economie.gouv.fr/entreprises/marches-publics-facture-electronique>`_. Chorus Pro accepts electronic invoices in Factur-X format in any of the 5 profiles. Chorus Pro also accepts electronic invoices in standards other than Factur-X.
+`Chorus Pro <https://portail.chorus-pro.gouv.fr/>`_ is the e-invoicing portal of the French administration. Starting January 1st 2020, all companies that invoice a public entity (State, local administrations, hospitals, etc.) must send their invoice through Chorus Pro. Chorus Pro accepts electronic invoices in Factur-X format in any of the 5 profiles (Chorus Pro also accepts electronic invoices in standards other than Factur-X).
