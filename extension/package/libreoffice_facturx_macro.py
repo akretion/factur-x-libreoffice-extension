@@ -45,6 +45,7 @@ INVOICE_REFUND_LANG = {
     # Add other langs here
     }
 
+CONFIG_NODE = "org.openoffice.Office.FilePicker.LastPath"
 
 def msg_box(doc, message):
     oSM = uno.getComponentContext().getServiceManager()
@@ -161,8 +162,39 @@ def generate_facturx_xml(data):
     xml_byte = ET.tostring(root)
     return xml_byte
 
+def get_last_path():
+    ctx = uno.getComponentContext()
+    cp = ctx.getServiceManager().createInstanceWithContext(
+        "com.sun.star.configuration.ConfigurationProvider", ctx
+    )
+    node = PropertyValue()
+    node.Name = "nodepath"
+    node.Value = CONFIG_NODE
+    try:
+        accessor = cp.createInstanceWithArguments("com.sun.star.configuration.ConfigurationUpdateAccess", (node,))
+        path = accessor.getPropertyValue("Path")
+        if path:
+            return str(Path(path))
+    except:
+        return None
+    return None
 
-def open_filepicker(title, path=None, mode=10, filter_tuple=None):
+def save_last_path(path):
+    ctx = uno.getComponentContext()
+    cp = ctx.getServiceManager().createInstanceWithContext(
+        "com.sun.star.configuration.ConfigurationProvider", ctx
+    )
+    node = PropertyValue()
+    node.Name = "nodepath"
+    node.Value = CONFIG_NODE
+    try:
+        accessor = cp.createInstanceWithArguments("com.sun.star.configuration.ConfigurationUpdateAccess", (node,))
+        accessor.setPropertyValue("Path", str(Path(path)))
+        accessor.commitChanges()
+    except:
+        pass
+
+def open_filepicker(title, mode=10, filter_tuple=None):
     """
     Possible modes: http://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1ui_1_1dialogs_1_1TemplateDescription.html
     mode 0: simple open
@@ -173,13 +205,18 @@ def open_filepicker(title, path=None, mode=10, filter_tuple=None):
 
     filepicker = oServiceManager.createInstanceWithArgumentsAndContext(
         "com.sun.star.ui.dialogs.OfficeFilePicker", (mode,), oCtx)
-    if path:
-        filepicker.setDisplayDirectory(path)
+    
+    last_path = get_last_path()
+    if last_path:
+        filepicker.setDisplayDirectory(Path(last_path).as_uri())
+
     if filter_tuple:
         filepicker.appendFilter(filter_tuple[0], filter_tuple[1])
     filepicker.Title = title
     if filepicker.execute():
-        return filepicker.getFiles()[0]
+        selected_file = filepicker.getFiles()[0]
+        save_last_path(Path(selected_file).parent)
+        return selected_file
 
 
 def get_and_check_data(doc, data_sheet):
