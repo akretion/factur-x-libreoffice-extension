@@ -132,17 +132,6 @@ def generate_facturx_xml(data):
         buyer_legal_org_id = ET.SubElement(
             buyer_legal_org, ET.QName(ns['ram'], 'ID'), schemeID='0002')
         buyer_legal_org_id.text = data['customer_siret']
-    buyer_country = ET.SubElement(
-        buyer, ET.QName(ns['ram'], 'PostalTradeAddress'))
-    buyer_country_code = ET.SubElement(
-        buyer_country, ET.QName(ns['ram'], 'CountryID'))
-    buyer_country_code.text = data['customer_country_code']
-    if data.get('customer_vat_number'):
-        buyer_tax_reg = ET.SubElement(
-            buyer, ET.QName(ns['ram'], 'SpecifiedTaxRegistration'))
-        buyer_tax_reg_id = ET.SubElement(
-            buyer_tax_reg, ET.QName(ns['ram'], 'ID'), schemeID='VA')
-        buyer_tax_reg_id.text = data['customer_vat_number']
     if data.get('customer_order_ref'):
         buyer_order_ref = ET.SubElement(
             trade_agreement, ET.QName(ns['ram'], 'BuyerOrderReferencedDocument'))
@@ -220,20 +209,10 @@ def get_and_check_data(doc, data_sheet):
             'required': True,
             'line': 8,
             },
-        'customer_vat_number': {
-            'type': 'char',
-            'required': False,
-            'line': 9,
-            },
         'customer_siret': {
             'type': 'char',
             'required': False,
             'line': 10,
-            },
-        'customer_country_code': {
-            'type': 'char',
-            'required': True,
-            'line': 11,
             },
         'customer_chorus_service_code': {
             'type': 'char',

@@ -4,14 +4,14 @@
                          xmlns:d="http://openoffice.org/extensions/description/2006">
 
     <identifier value="com.akretion.factur-x" />
-    <version value="0.25" />
+    <version value="0.26" />
     <platform value="all" />
     <display-name>
         <name lang="en">Factur-X Invoice Generator</name>
         <name lang="fr">Générateur de factures Factur-X</name>
     </display-name>
     <publisher>
-        <name xlink:href="mailto:alexis@via.ecp.fr">Alexis de Lattre</name>
+        <name xlink:href="mailto:alexis.delattre@akretion.com">Alexis de Lattre</name>
     </publisher>
     <icon>
         <default xlink:href="icon_42.png" />
