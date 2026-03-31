@@ -23,6 +23,18 @@ The key targets of this project are:
 
 This extension has been initially developped by Alexis de Lattre from `Akretion France <https://akretion.com/>`_. It is published under the `GPL licence <https://www.gnu.org/licenses/gpl-3.0.html>`_.
 
+==================
+End of maintenance
+==================
+
+With the e-invoicing reform starting in France on September 2026, the **Minimum** profile for Factur-X will be deprecated in favor of upper profiles that contain more detailed information in the embedded XML file.
+
+Of course, it is technically possible to adapt the code of this Libreoffice extension to generate Factur-X invoices at a higher profile. But, even if it is technically possible, I think it would be a trap. Factur-X at minimum profile has about 15 structured fields in the XML file, so it's easy to have a quick look at them to check their validity before generating the Factur-X file. But, when generating a Factur-X invoice at a profile that contain the details of lines (profile Basic, EN16931 or Extended) with several invoice lines, the embedded XML file will contain at least 50 structured fields, and it can be much more if the invoice has a lot of lines. So it becomes impossible to check rapidly the structured data before generating the Factur-X file. And checking the structured data would imply several consistency checks between the amounts in the invoice lines and the total amounts of the invoice, between the VAT tax in the lines and the VAT totals, etc. I think that, moving from Factur-X minimum profile to an upper profile implies moving away from a spreadsheet tool and adopt an invoicing software connected to a database that implements all the consistency checks and controls required for a reliable generation of the XML file embedded in the PDF.
+
+There are several opensource software that are able to generate Factur-X invoices in profile Basic, EN16931 or Extended. I personnally use `Odoo Community <https://www.odoo.com/>`_ + `OCA <https://odoo-community.org/>`_, but many other opensource tools exists.
+
+If you prefer to continue to use a spreadsheet to generate Factur-X invoice in profile Basic, EN16931 or Extended despite the risks of generating an inconsistent factur-x.xml file, you can have a look at the Github project `zugferd-facturx-rechnungen-profil-en16931 <https://github.com/Pityrias/zugferd-facturx-rechnungen-profil-en16931>`_ which is a fork of this libreoffice extension that support profile EN16931.
+
 ===============
 Video tutorials
 ===============
@@ -35,6 +47,10 @@ A video tutorial that shows how to install and use this LibreOffice extension is
 =============
 Release notes
 =============
+
+* Version 0.26 dated March 31st 2026:
+
+  * Update XML to comply with schematron for Factur-X minimum profile
 
 * Version 0.25 dated January 16h 2025:
 
